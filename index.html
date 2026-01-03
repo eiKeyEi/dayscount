@@ -69,7 +69,7 @@
 	      	],
 	      	[
 	      		{ idx:  6, name: "jul", days: 31, fDay: 0, },
-	      		{ idx:  7, name: "aug", days: 30, fDay: 0, },
+	      		{ idx:  7, name: "aug", days: 31, fDay: 0, },
 	      		{ idx:  8, name: "sep", days: 30, fDay: 0, },
 	      	],
 	      	[
@@ -99,13 +99,13 @@
     	leapYear : function () {
     		let app = this;
     		if (app.yy % 400 == 0) {
-    			app.months[1].days = 29;
+    			app.months[0][1].days = 29;
     		} else if (app.yy % 100 == 0) {
-    			app.months[1].days = 28;
+    			app.months[0][1].days = 28;
     		} else if (app.yy % 4 == 0) {
-    			app.months[1].days = 29;
+    			app.months[0][1].days = 29;
     		} else {
-    			app.months[1].days = 28;
+    			app.months[0][1].days = 28;
     		}
     	},
     	calcFDay : function () {
@@ -130,7 +130,7 @@
     			cnt++;
     		}
     		for (let i = 1; i <= days; i++) {
-    			console.log (idx, app.mm, i, app.dd)
+    			// console.log (idx, app.mm, i, app.dd)
     			if (idx < app.mm) {
     				txt += '<div style="background: white; width: 10px; height: 10px; border-radius: 50%; margin: 2px;"></div>';
     			} else if (idx == app.mm && i < app.dd) {
