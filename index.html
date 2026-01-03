@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Calendar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300&family=Tsukimi+Rounded&display=swap" rel="stylesheet">
+	<style>
+		body {
+			background: black;
+			color: white;
+			font-family: "Quicksand", sans-serif;
+		  font-optical-sizing: auto;
+		  font-weight: 300;
+		  font-style: normal;
+		  height: 100vh;
+		  margin: 0;
+		  align-content: center;
+		  text-align: center;
+		}
+		.app {
+		  display: flex;
+		  justify-content: center;
+		  align-content: center;
+		}
+	</style>
+</head>
+<body>
+	<div id="app" class="app">
+		<table>
+			<tbody>
+				<tr v-for="line in months">
+					<td v-for="month in line" style="vertical-align: top; padding: 0 5px">
+						<div>
+							{{ month.name }}
+						</div>
+						<div v-html="monthContent (month)"></div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						{{ daysPast - 1 }} <span style="color: orange;">|</span> <span style="color: gray">{{ daysLeft }}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<script>
+  const { createApp } = Vue
+
+  createApp({
+    data() {
+      return {
+      	months: [
+      		[
+	      		{ idx:  0, name: "jan", days: 31, fDay: 0, },
+	      		{ idx:  1, name: "feb", days: 28, fDay: 0, },
+	      		{ idx:  2, name: "mar", days: 31, fDay: 0, },
+	      	],
+	      	[
+	      		{ idx:  3, name: "apr", days: 30, fDay: 0, },
+	      		{ idx:  4, name: "may", days: 31, fDay: 0, },
+	      		{ idx:  5, name: "jun", days: 30, fDay: 0, },
+	      	],
+	      	[
+	      		{ idx:  6, name: "jul", days: 31, fDay: 0, },
+	      		{ idx:  7, name: "aug", days: 30, fDay: 0, },
+	      		{ idx:  8, name: "sep", days: 30, fDay: 0, },
+	      	],
+	      	[
+	      		{ idx:  9, name: "oct", days: 31, fDay: 0, },
+	      		{ idx: 10, name: "nov", days: 30, fDay: 0, },
+	      		{ idx: 11, name: "dec", days: 31, fDay: 0, },
+	      	],
+      	],
+      	dd: 1,
+      	mm: 1,
+      	yy: 1,
+      	daysPast: 1,
+      	daysLeft: 1,
+      }
+    },
+    mounted () {
+    	let app = this;
+    	let tmp = new Date ();
+    	app.dd = tmp.getDate ();
+    	app.mm = tmp.getMonth ();
+    	app.yy = tmp.getFullYear ();
+    	app.leapYear ();
+    	app.calcFDay ();
+    	app.calcDays ();
+    },
+    methods: {
+    	leapYear : function () {
+    		let app = this;
+    		if (app.yy % 400 == 0) {
+    			app.months[1].days = 29;
+    		} else if (app.yy % 100 == 0) {
+    			app.months[1].days = 28;
+    		} else if (app.yy % 4 == 0) {
+    			app.months[1].days = 29;
+    		} else {
+    			app.months[1].days = 28;
+    		}
+    	},
+    	calcFDay : function () {
+    		let app = this;
+    		app.months.forEach (line => {
+    			line.forEach (month => {
+	    			month.fDay = new Date (month.name + " 1 " + app.yy).getDay () + 6;
+	    			month.fDay %= 7;
+	    		})
+    		})
+    	},
+    	monthContent : function (month) {
+    		let app = this;
+    		let days = month.days;
+    		let fd = month.fDay;
+    		let idx = month.idx;
+    		let cnt = 0;
+    		let txt = "";
+    		txt += "<div style='display: flex;'>";
+    		for (let i = 0; i < fd; i++) {
+    			txt += '<div style="background: black; width: 10px; height: 10px; border-radius: 50%; margin: 2px;"></div>';
+    			cnt++;
+    		}
+    		for (let i = 1; i <= days; i++) {
+    			console.log (idx, app.mm, i, app.dd)
+    			if (idx < app.mm) {
+    				txt += '<div style="background: white; width: 10px; height: 10px; border-radius: 50%; margin: 2px;"></div>';
+    			} else if (idx == app.mm && i < app.dd) {
+    				txt += '<div style="background: white; width: 10px; height: 10px; border-radius: 50%; margin: 2px;"></div>';
+    			} else if (idx == app.mm && i == app.dd) {
+    				txt += '<div style="background: orange; width: 10px; height: 10px; border-radius: 50%; margin: 2px;"></div>';
+					} else {
+    				txt += '<div style="background: gray; width: 10px; height: 10px; border-radius: 50%; margin: 2px;"></div>';
+    			}
+    			cnt++;
+    			if (cnt == 7) {
+    				cnt = 0;
+    				txt += "</div><div style='display: flex;'>";
+    			}
+    		}
+    		txt += "</div>";
+    		return txt;
+    	},
+    	calcDays : function () {
+    		let app = this;
+    		app.daysPast = 0;
+    		app.months.forEach (line => {
+    			line.forEach (month => {
+    				if (month.idx < app.mm) {
+    					app.daysPast += month.days;
+    				} else if (month.idx == app.mm) {
+    					app.daysPast += app.dd;
+    				}
+    			})
+    		})
+    		app.daysLeft = 365 - app.daysPast;
+    		if (app.months[0][1].days == 29)
+    				app.daysLeft++;
+    	}
+    }
+  }).mount('#app')
+</script>
+</html>
